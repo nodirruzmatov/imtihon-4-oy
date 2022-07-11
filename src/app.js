@@ -10,4 +10,4 @@ const getData = async () => {
   console.log(data);
 };
 
-getData();
+// getData();

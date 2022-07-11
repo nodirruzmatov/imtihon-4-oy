@@ -410,6 +410,90 @@ video {
   height: auto;
 }
 
+@font-face {
+  font-family: "Montserrat";
+
+  src: url("../fonts/Montserrat-Light.woff2") format("woff2"),
+      url("../fonts/Montserrat-Light.woff") format("woff"),
+      url("../fonts/Montserrat-Light.ttf") format("truetype");
+
+  font-weight: 300;
+
+  font-style: normal;
+
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Montserrat";
+
+  src: url("../fonts/Montserrat-SemiBold.woff2") format("woff2"),
+      url("../fonts/Montserrat-SemiBold.woff") format("woff"),
+      url("../fonts/Montserrat-SemiBold.ttf") format("truetype");
+
+  font-weight: 600;
+
+  font-style: normal;
+
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Montserrat";
+
+  src: url("../fonts/Montserrat-Medium.woff2") format("woff2"),
+      url("../fonts/Montserrat-Medium.woff") format("woff"),
+      url("../fonts/Montserrat-Medium.ttf") format("truetype");
+
+  font-weight: 500;
+
+  font-style: normal;
+
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Noto Sans";
+
+  src: url("../fonts/NotoSans-Medium.woff2") format("woff2"),
+      url("../fonts/NotoSans-Medium.woff") format("woff"),
+      url("../fonts/NotoSans-Medium.ttf") format("truetype");
+
+  font-weight: 500;
+
+  font-style: normal;
+
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Rubik";
+
+  src: url("../fonts/Rubik-Medium.woff2") format("woff2"),
+      url("../fonts/Rubik-Medium.woff") format("woff"),
+      url("../fonts/Rubik-Medium.ttf") format("truetype");
+
+  font-weight: 500;
+
+  font-style: normal;
+
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Rubik";
+
+  src: url("../fonts/Rubik-Regular.woff2") format("woff2"),
+      url("../fonts/Rubik-Regular.woff") format("woff"),
+      url("../fonts/Rubik-Regular.ttf") format("truetype");
+
+  font-weight: normal;
+
+  font-style: normal;
+
+  font-display: swap;
+}
+
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
@@ -549,4 +633,67 @@ video {
   --tw-backdrop-opacity:  ;
   --tw-backdrop-saturate:  ;
   --tw-backdrop-sepia:  ;
+}
+
+.container {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.box-border {
+  box-sizing: border-box;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.max-w-\[670px\] {
+  max-width: 670px;
+}
+
+.max-w-\[1192px\] {
+  max-width: 1192px;
+}
+
+.p-\[15px\] {
+  padding: 15px;
+}
+
+.pt-\[15px\] {
+  padding-top: 15px;
 }
