@@ -10,6 +10,7 @@ const elModal = document.querySelector(".modal");
 const elModalBofy = document.querySelector(".modal__body");
 const elModalClose = document.querySelector(".modal__close");
 const elModalBg = document.querySelector(".modal-bg");
+const elLogoutBtn = document.querySelector(".logout-btn");
 
 let srcValue = "javascript";
 
@@ -18,7 +19,18 @@ const localData = JSON.parse(window.localStorage.getItem("marked"));
 const bookmarkArr = localData || [];
 let order = "relevance";
 
-let pages;
+const token = window.localStorage.getItem("token");
+
+// ! remove token
+if (!token) {
+  window.location.replace("login.html");
+}
+
+elLogoutBtn.addEventListener("clicl", () => {
+  window.localStorage.removeItem("token");
+
+  window.location.replace("login.html");
+});
 
 // ! ORDER BTN
 elOrderBtn.addEventListener("click", (ent) => {
@@ -60,14 +72,14 @@ const getData = async () => {
 
   const data = await request.json();
 
-  console.log(data.items);
+  // console.log(data.items);
 
   render(data.items, elBooksList);
   renderBookmark(bookmarkArr, elBookmarkList);
 
   elResultNum.textContent = `Showing ${data.totalItems} Result(s)`;
 
-  pages = Math.ceil(data.totalItems / 10);
+  // pages = Math.ceil(data.totalItems / 10);
   // addPages(pages, elAllPages);
 };
 
@@ -96,7 +108,7 @@ const render = (arr, elHtml) => {
         <button data-info="${book.id}"
           class="books-moreInfo py-[10px] px-[26px] rounded-[4px] bg-[#f3f8ff] text-[14px] leading-[17px] font-medium text-[#3f75ff]">More
           Info</button>
-          
+
         <a href="${book.volumeInfo.previewLink}" target="_blanck"
           class="books-read text-center pt-[9px] col-span-2 rounded-[4px] bg-[#75828A] text-[14px] leading-[17px] font-medium text-[#fff]">Read</a>
       </div>
@@ -115,12 +127,12 @@ const renderBookmark = (local, elHtml) => {
   local.forEach((book) => {
     const html = `
       <li class="bookmark-item mb-[15px] px-[10px] py-[15px] flex justify-between rounded-[4px] bg-[#f8fafd]">
-    
+
         <div class="bookmark-text max-w-[170px] w-full">
           <h3 class="bookmark-title text-[16px] leading-[19px] font-medium">${book.volumeInfo.title}</h3>
           <p class="bookmark-owner text-[13px] leading-[18px] font-normal text-[#757881]">${book.volumeInfo.authors}</p>
         </div>
-    
+
         <div class="bookmark-btn flex items-center">
           <a class="bookmark-read mr-[5px]" href="${book.volumeInfo.previewLink}" target="_blanck">
             <img src="../images/read-icon.png" width="24" height="24" alt="reading icon">
@@ -195,43 +207,42 @@ elBooksList.addEventListener("click", async (ent) => {
     const html = `
       <div class="modal__top flex justify-between items-center max-w-[5520px] w-full pt-5 px-5 bg-[#F8FAFD]">
         <h2 class="modal_heading text-[24px] leading-[28px] font-[500] text-[#222531]">${modalData.volumeInfo.title}</h2>
-  
+
         <button class="modal__close w-[14px] h-[14px] text-[#58667E] text-[24px] font-[300]">X</button>
       </div>
-  
+
       <div class="modal__middle mt-11 px-5 bg-white">
-  
+
         <img src="${modalData.volumeInfo.imageLinks.smallThumbnail}" width="229" height="300" alt="book">
-  
+
         <p class="modal__desc mt-11 mb-[51px] text-[14px] leading-[170%] font-[400] text-[#58667E]">${modalData.volumeInfo.description}
         </p>
-  
+
         <div>
           <p class="pb-[21px] text-[#222531] font-[400] text-[14px] leading-[17px]">Author :<span class="modal-author ml-[17px] py-[6px] px-[21px] rounded-[30px] font-[400] text-[14px] leading-[17px] text-[#0D75FF] bg-[#e9f3ff]">${modalData.volumeInfo.authors[0]}</span></p>
-  
-  
+
           <p class="pb-[21px] text-[#222531] font-[400] text-[14px] leading-[17px]">Published : <span class="modal-published ml-[17px] py-[6px] px-[21px] rounded-[30px] font-[400] text-[14px] leading-[17px] text-[#0D75FF] bg-[#e9f3ff]">${modalData.volumeInfo.publisheDate}</span>
           </p>
-  
+
           <p class="pb-[21px] text-[#222531] font-[400] text-[14px] leading-[17px]">Publishers:<span class="modal-publisher ml-[17px] py-[6px] px-[21px] rounded-[30px] font-[400] text-[14px] leading-[17px] text-[#0D75FF] bg-[#e9f3ff]">${modalData.volumeInfo.publisher}</span>
           </p>
-  
+
           <p class="pb-[21px] text-[#222531] font-[400] text-[14px] leading-[17px]">Categories :<span
               class="ml-[17px] py-[6px] px-[21px] rounded-[30px] font-[400] text-[14px] leading-[17px] text-[#0D75FF] bg-[#e9f3ff]">${modalData.volumeInfo.categories[0]}</span>
           </p>
-  
+
           <p class="pb-[21px] text-[#222531] font-[400] text-[14px] leading-[17px]">Pages Count:<span
               class="ml-[17px] py-[6px] px-[21px] rounded-[30px] font-[400] text-[14px] leading-[17px] text-[#0D75FF] bg-[#e9f3ff]">${modalData.volumeInfo.pageCount}</span>
           </p>
         </div>
-  
+
       </div>
-  
+
       <div class="modal__bottom flex justify-end max-w-[5520px] w-full px-5 py-4 bg-[#F8FAFD]">
         <a href="${modalData.volumeInfo.previewLink}" target="_blank"
           class="py-[9px] px-[38px] rounded-[4px] text-[14px] leading-[17px] font-[500] text-white bg-[#75828A]">Read</a>
       </div>
-  
+
     `;
 
     elModalBofy.insertAdjacentHTML("beforeend", html);
@@ -259,5 +270,3 @@ const addPages = (page, elhtml) => {
     elhtml.insertAdjacentHTML("beforeend", html);
   }
 };
-
-elAllPages;
