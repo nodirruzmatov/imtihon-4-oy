@@ -2,22 +2,24 @@
 
 const elBooksList = document.querySelector(".books__list");
 const elSearchInput = document.querySelector(".header__search");
+const elBookmarkList = document.querySelector(".bookmar-list");
 
 let srcValue = "javascript";
 
-const bookmarkArr = [];
+const localData = JSON.parse(window.localStorage.getItem("marked"));
 
-JSON.parse(window.localStorage.getItem("mared")) ||
-  // ! get input value for request
-  elSearchInput.addEventListener("change", (ent) => {
-    ent.preventDefault();
+const bookmarkArr = localData || [];
 
-    srcValue = elSearchInput.value;
+// ! get input value for request
+elSearchInput.addEventListener("change", (ent) => {
+  ent.preventDefault();
 
-    elSearchInput.value = "";
-    elBooksList.innerHTML = null;
-    getData();
-  });
+  srcValue = elSearchInput.value;
+
+  elSearchInput.value = "";
+  elBooksList.innerHTML = null;
+  getData();
+});
 
 // ! get data from backend
 const getData = async () => {
@@ -30,6 +32,7 @@ const getData = async () => {
   console.log(data.items[0]);
 
   render(data.items, elBooksList);
+  renderBookmark(bookmarkArr, elBookmarkList);
 };
 
 getData();
@@ -67,44 +70,63 @@ const render = (arr, elHtml) => {
   });
 };
 
-// !bookmark
-// const renderBookmark = (local, elHtml) => {
-//   const html = `
-//   <li class="bookmark-item mb-[15px] px-[10px] py-[15px] flex justify-between rounded-[4px] bg-[#f8fafd]">
+// !bookmark*
+const renderBookmark = (local, elHtml) => {
+  elBookmarkList.innerHTML = null;
 
-//     <div class="bookmark-text">
-//       <h3 class="bookmark-title text-[16px] leading-[19px] font-medium">Python</h3>
-//       <p class="bookmark-owner text-[13px] leading-[18px] font-normal text-[#757881]">David M. Beazley</p>
-//     </div>
+  local.forEach((book) => {
+    const html = `
+      <li class="bookmark-item mb-[15px] px-[10px] py-[15px] flex justify-between rounded-[4px] bg-[#f8fafd]">
+    
+        <div class="bookmark-text max-w-[170px] w-full">
+          <h3 class="bookmark-title text-[16px] leading-[19px] font-medium">${book.volumeInfo.title}</h3>
+          <p class="bookmark-owner text-[13px] leading-[18px] font-normal text-[#757881]">${book.volumeInfo.authors}</p>
+        </div>
+    
+        <div class="bookmark-btn flex items-center">
+          <a class="bookmark-read mr-[5px]" href="${book.volumeInfo.previewLink}" target="_blanck">
+            <img src="../images/read-icon.png" width="24" height="24" alt="reading icon">
+          </a>
+          <button class="bookmark-remove" data-remove="${book.id}">
+            <img data-remove="${book.id}" src="../images/remove-icon.png" width="24" height="24" alt="reading icon">
+          </button>
+        </div>
+      </li>
+    `;
 
-//     <div class="bookmark-btn flex">
-//       <button class="bookmark-read mr-[5px]">
-//         <img src="../images/read-icon.png" width="24" height="24" alt="reading icon">
-//       </button>
-//       <button class="bookmark-remove">
-//         <img src="../images/remove-icon.png" width="24" height="24" alt="reading icon">
-//       </button>
-//     </div>
-//   </li>
-//   `;
-// };
+    elHtml.insertAdjacentHTML("beforeend", html);
+  });
+};
 
-// elBooksList.addEventListener("click", async (ent) => {
-//   const request = await fetch(
-//     `https://www.googleapis.com/books/v1/volumes?q=${srcValue}`
-//   );
+elBooksList.addEventListener("click", async (ent) => {
+  const request = await fetch(
+    `https://www.googleapis.com/books/v1/volumes?q=${srcValue}`
+  );
 
-//   const data = await request.json();
+  const data = await request.json();
 
-//   const bookMark = ent.target.dataset.mark;
+  const bookMark = ent.target.dataset.mark;
 
-//   data.items.forEach((book) => {
-//     if (book.id === bookMark) {
-//       if (!bookmarkArr.includes(book.volumeInfo)) {
-//         console.log(!bookmarkArr.includes(book));
-//         bookmarkArr.push(book);
-//         console.log(bookmarkArr);
-//       }
-//     }
-//   });
-// });
+  data.items.forEach((book) => {
+    if (book.id === bookMark) {
+      if (!bookmarkArr.some((reading) => reading.id === bookMark)) {
+        bookmarkArr.push(book);
+
+        renderBookmark(bookmarkArr, elBookmarkList);
+        window.localStorage.setItem("marked", JSON.stringify(bookmarkArr));
+      }
+    }
+  });
+});
+
+elBookmarkList.addEventListener("click", (ent) => {
+  const removeBtn = ent.target.dataset.remove;
+
+  bookmarkArr.splice(
+    bookmarkArr.findIndex((remove) => remove.id === removeBtn),
+    1
+  );
+
+  renderBookmark(bookmarkArr, elBookmarkList);
+  window.localStorage.setItem("marked", JSON.stringify(bookmarkArr));
+});
