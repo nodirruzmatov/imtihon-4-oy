@@ -3,12 +3,43 @@
 const elBooksList = document.querySelector(".books__list");
 const elSearchInput = document.querySelector(".header__search");
 const elBookmarkList = document.querySelector(".bookmar-list");
+const elResultNum = document.querySelector(".result__desc");
+const elAllPages = document.querySelector(".books__allPages");
+const elOrderBtn = document.querySelector(".orderBtn");
+const elModal = document.querySelector(".modal");
+const elModalBofy = document.querySelector(".modal__body");
+const elModalClose = document.querySelector(".modal__close");
+const elModalBg = document.querySelector(".modal-bg");
 
 let srcValue = "javascript";
 
 const localData = JSON.parse(window.localStorage.getItem("marked"));
 
 const bookmarkArr = localData || [];
+let order = "relevance";
+
+let pages;
+
+// ! ORDER BTN
+elOrderBtn.addEventListener("click", (ent) => {
+  if (order === "newest") {
+    order = "relevance";
+
+    elOrderBtn.textContent = "Order by newest";
+
+    elBooksList.innerHTML = null;
+
+    getData();
+  } else if (order === "relevance") {
+    order = "newest";
+
+    elOrderBtn.textContent = "Order by relevance";
+
+    elBooksList.innerHTML = null;
+
+    getData();
+  }
+});
 
 // ! get input value for request
 elSearchInput.addEventListener("change", (ent) => {
@@ -24,15 +55,20 @@ elSearchInput.addEventListener("change", (ent) => {
 // ! get data from backend
 const getData = async () => {
   const request = await fetch(
-    `https://www.googleapis.com/books/v1/volumes?q=${srcValue}`
+    `https://www.googleapis.com/books/v1/volumes?q=${srcValue}&orderBy=${order}&startIndex=0`
   );
 
   const data = await request.json();
 
-  console.log(data.items[0]);
+  console.log(data.items);
 
   render(data.items, elBooksList);
   renderBookmark(bookmarkArr, elBookmarkList);
+
+  elResultNum.textContent = `Showing ${data.totalItems} Result(s)`;
+
+  pages = Math.ceil(data.totalItems / 10);
+  // addPages(pages, elAllPages);
 };
 
 getData();
@@ -56,9 +92,11 @@ const render = (arr, elHtml) => {
       <div class="books__btn grid grid-cols-2 grid-rows-2 gap-[5px]">
         <button data-mark="${book.id}"
           class="books-bookmark py-[10px] px-[26px] rounded-[4px] bg-[#FFD80D] text-[14px] leading-[17px] font-medium">Bookmark</button>
-        <button
+
+        <button data-info="${book.id}"
           class="books-moreInfo py-[10px] px-[26px] rounded-[4px] bg-[#f3f8ff] text-[14px] leading-[17px] font-medium text-[#3f75ff]">More
           Info</button>
+          
         <a href="${book.volumeInfo.previewLink}" target="_blanck"
           class="books-read text-center pt-[9px] col-span-2 rounded-[4px] bg-[#75828A] text-[14px] leading-[17px] font-medium text-[#fff]">Read</a>
       </div>
@@ -88,7 +126,7 @@ const renderBookmark = (local, elHtml) => {
             <img src="../images/read-icon.png" width="24" height="24" alt="reading icon">
           </a>
           <button class="bookmark-remove" data-remove="${book.id}">
-            <img data-remove="${book.id}" src="../images/remove-icon.png" width="24" height="24" alt="reading icon">
+            <img class="bookmark-remove" data-remove="${book.id}" src="../images/remove-icon.png" width="24" height="24" alt="reading icon">
           </button>
         </div>
       </li>
@@ -99,34 +137,127 @@ const renderBookmark = (local, elHtml) => {
 };
 
 elBooksList.addEventListener("click", async (ent) => {
-  const request = await fetch(
-    `https://www.googleapis.com/books/v1/volumes?q=${srcValue}`
-  );
+  if (ent.target.matches(".books-bookmark")) {
+    const request = await fetch(
+      `https://www.googleapis.com/books/v1/volumes?q=${srcValue}`
+    );
 
-  const data = await request.json();
+    const data = await request.json();
 
-  const bookMark = ent.target.dataset.mark;
+    const bookMark = ent.target.dataset.mark;
 
-  data.items.forEach((book) => {
-    if (book.id === bookMark) {
-      if (!bookmarkArr.some((reading) => reading.id === bookMark)) {
-        bookmarkArr.push(book);
+    data.items.forEach((book) => {
+      if (book.id === bookMark) {
+        if (!bookmarkArr.some((reading) => reading.id === bookMark)) {
+          bookmarkArr.push(book);
 
-        renderBookmark(bookmarkArr, elBookmarkList);
-        window.localStorage.setItem("marked", JSON.stringify(bookmarkArr));
+          renderBookmark(bookmarkArr, elBookmarkList);
+          window.localStorage.setItem("marked", JSON.stringify(bookmarkArr));
+        }
       }
-    }
-  });
+    });
+  }
 });
 
 elBookmarkList.addEventListener("click", (ent) => {
-  const removeBtn = ent.target.dataset.remove;
+  if (ent.target.matches(".bookmark-remove")) {
+    const removeBtn = ent.target.dataset.remove;
 
-  bookmarkArr.splice(
-    bookmarkArr.findIndex((remove) => remove.id === removeBtn),
-    1
-  );
+    bookmarkArr.splice(
+      bookmarkArr.findIndex((remove) => remove.id === removeBtn),
+      1
+    );
 
-  renderBookmark(bookmarkArr, elBookmarkList);
-  window.localStorage.setItem("marked", JSON.stringify(bookmarkArr));
+    renderBookmark(bookmarkArr, elBookmarkList);
+    window.localStorage.setItem("marked", JSON.stringify(bookmarkArr));
+  }
 });
+
+// ! Modal----------------------------------------------------
+elBooksList.addEventListener("click", async (ent) => {
+  if (ent.target.matches(".books-moreInfo")) {
+    elModal.classList.remove("hidden");
+
+    elModalBofy.innerHTML = null;
+
+    const request = await fetch(
+      `https://www.googleapis.com/books/v1/volumes?q=${srcValue}`
+    );
+
+    const data = await request.json();
+
+    const infoBtn = ent.target.dataset.info;
+    console.log(infoBtn);
+
+    const modalData = data.items.find((book) => book.id === infoBtn);
+    console.log(data.items);
+
+    const html = `
+      <div class="modal__top flex justify-between items-center max-w-[5520px] w-full pt-5 px-5 bg-[#F8FAFD]">
+        <h2 class="modal_heading text-[24px] leading-[28px] font-[500] text-[#222531]">${modalData.volumeInfo.title}</h2>
+  
+        <button class="modal__close w-[14px] h-[14px] text-[#58667E] text-[24px] font-[300]">X</button>
+      </div>
+  
+      <div class="modal__middle mt-11 px-5 bg-white">
+  
+        <img src="${modalData.volumeInfo.imageLinks.smallThumbnail}" width="229" height="300" alt="book">
+  
+        <p class="modal__desc mt-11 mb-[51px] text-[14px] leading-[170%] font-[400] text-[#58667E]">${modalData.volumeInfo.description}
+        </p>
+  
+        <div>
+          <p class="pb-[21px] text-[#222531] font-[400] text-[14px] leading-[17px]">Author :<span class="modal-author ml-[17px] py-[6px] px-[21px] rounded-[30px] font-[400] text-[14px] leading-[17px] text-[#0D75FF] bg-[#e9f3ff]">${modalData.volumeInfo.authors[0]}</span></p>
+  
+  
+          <p class="pb-[21px] text-[#222531] font-[400] text-[14px] leading-[17px]">Published : <span class="modal-published ml-[17px] py-[6px] px-[21px] rounded-[30px] font-[400] text-[14px] leading-[17px] text-[#0D75FF] bg-[#e9f3ff]">${modalData.volumeInfo.publisheDate}</span>
+          </p>
+  
+          <p class="pb-[21px] text-[#222531] font-[400] text-[14px] leading-[17px]">Publishers:<span class="modal-publisher ml-[17px] py-[6px] px-[21px] rounded-[30px] font-[400] text-[14px] leading-[17px] text-[#0D75FF] bg-[#e9f3ff]">${modalData.volumeInfo.publisher}</span>
+          </p>
+  
+          <p class="pb-[21px] text-[#222531] font-[400] text-[14px] leading-[17px]">Categories :<span
+              class="ml-[17px] py-[6px] px-[21px] rounded-[30px] font-[400] text-[14px] leading-[17px] text-[#0D75FF] bg-[#e9f3ff]">${modalData.volumeInfo.categories[0]}</span>
+          </p>
+  
+          <p class="pb-[21px] text-[#222531] font-[400] text-[14px] leading-[17px]">Pages Count:<span
+              class="ml-[17px] py-[6px] px-[21px] rounded-[30px] font-[400] text-[14px] leading-[17px] text-[#0D75FF] bg-[#e9f3ff]">${modalData.volumeInfo.pageCount}</span>
+          </p>
+        </div>
+  
+      </div>
+  
+      <div class="modal__bottom flex justify-end max-w-[5520px] w-full px-5 py-4 bg-[#F8FAFD]">
+        <a href="${modalData.volumeInfo.previewLink}" target="_blank"
+          class="py-[9px] px-[38px] rounded-[4px] text-[14px] leading-[17px] font-[500] text-white bg-[#75828A]">Read</a>
+      </div>
+  
+    `;
+
+    elModalBofy.insertAdjacentHTML("beforeend", html);
+  }
+});
+
+elModal.addEventListener("click", (ent) => {
+  if (ent.target.matches(".modal__close")) {
+    elModal.classList.add("hidden");
+  }
+});
+
+elModalBg.addEventListener("click", () => {
+  elModal.classList.add("hidden");
+});
+
+// !pages
+
+const addPages = (page, elhtml) => {
+  for (let i = 1; i <= page; i++) {
+    const html = `
+      <button class=" mr-2 p-[4px] bg-white w-[32px] h-[32px] border border-[#DFE3E8] rounded-[4px] text-[14px] leading-[20px] font-[700]">${i}</button>
+    `;
+
+    elhtml.insertAdjacentHTML("beforeend", html);
+  }
+};
+
+elAllPages;

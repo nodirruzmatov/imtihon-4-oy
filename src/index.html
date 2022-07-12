@@ -10,10 +10,22 @@
   <title>books</title>
 </head>
 
-<body class="body box-border">
+<body class="body box-border snap-none">
 
-  <header class="header  border-b border-b-[#E5E5E5]">
-    <div class="container mx-auto pt-[15px] pb-[11px] flex justify-between items-center ">
+  <header class="header border-b border-b-[#E5E5E5]">
+    <div class="container relative mx-auto pt-[15px] pb-[11px] flex justify-between items-center ">
+
+      <!-- !Modal -->
+      <div
+        class="modal hidden fixed z-10 mx-auto  bg-black/50 w-screen h-screen left-0 top-0 right-0 overflow-y-scroll">
+
+        <div class="modal-bg w-screen h-screen z-11"></div>
+
+        <div
+          class="modal__body absolute z-12 flex flex-col justify-between items-center bg-white opacity-100 h-screen top-0 right-0 max-w-[552px] w-full">
+        </div>
+
+      </div>
 
       <a class="" href="#">
         <img src="../images/logo.svg" width="226" height="44" alt="site logo">
@@ -45,7 +57,7 @@
 
         <span></span>
 
-        <button class="py-[5px] px-[13px] rounded-[4px] text-[#fff] bg-[#A6B0C3]">Order by newest</button>
+        <button class="orderBtn py-[5px] px-[13px] rounded-[4px] text-[#fff] bg-[#A6B0C3]">Order by newest</button>
 
       </div>
     </section>
@@ -61,7 +73,7 @@
           <p class="bookmark-desc  text-[14px] font-normal leading-[155%]">If you don’t like to read, you haven’t found
             the right book</p>
 
-          <ul class="bookmar-list mt-[25px]">
+          <ul class="bookmar-list mt-[25px] ">
 
           </ul>
 
@@ -69,23 +81,23 @@
 
 
         <!-- ! BOOKS list -->
-        <div class="books-box  p-[40px] bg-[#f8fafd]">
+        <div class="books-box flex flex-col items-center w-full p-[40px] bg-[#f8fafd]">
 
           <ul class="books__list grid grid-cols-3 gap-[33px] w-full">
 
-
-
           </ul>
 
-          <div class="books__pages flex items-center">
+          <div class="books__pages flex items-start mt-[33px] max-w-[400px] w-full">
 
-            <button class="back_btn">
+            <button class="back_btn mr-2 p-[4px] bg-white w-[32px] h-[32px] border border-[#DFE3E8] rounded-[4px]">
               <img src="../images/back.png" width="32" height="32" alt="back icon">
             </button>
 
-            <div class="books__allPages"></div>
+            <div class="books__allPages overflow-x-auto max-w-[400px] h-14 w-full whitespace-nowrap">
 
-            <button class="next_btn">
+            </div>
+
+            <button class="next_btn p-[4px] bg-white w-[32px] h-[32px] border border-[#DFE3E8] rounded-[4px]">
               <img src="../images/next.png" width="32" height="32" alt="next icon">
             </button>
 
